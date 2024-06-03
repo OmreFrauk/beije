@@ -86,4 +86,4 @@ EMAIL_PASS=your-email-password
 
 ## ChatGPT usage gist
 
-[here](https://gist.github.com/OmreFrauk/efc58678b90f17b2f49e6c68f1918d54.js)
+[here](https://gist.github.com/OmreFrauk/efc58678b90f17b2f49e6c68f1918d54)
