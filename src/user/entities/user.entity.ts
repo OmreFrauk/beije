@@ -15,5 +15,5 @@ export class User {
   verificationToken: string;
 
   @Column({ default: false })
-  verified: boolean;
+  isVerified: boolean;
 }

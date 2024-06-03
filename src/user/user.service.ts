@@ -13,13 +13,20 @@ export class UserService {
     private userRepository: Repository<User>,
   ) {}
   async register(createUserDto: CreateUserDto): Promise<void> {
-    const verificationToken = crypto.randomBytes(16).toString('hex');
-    const user = this.userRepository.create({
-      ...createUserDto,
-      verificationToken,
-    });
-    await this.userRepository.save(user);
-    await this.sendVerificationEmail(user, verificationToken);
+    try {
+      const verificationToken = crypto.randomBytes(16).toString('hex');
+      const user = this.userRepository.create({
+        ...createUserDto,
+        verificationToken,
+        isVerified: false,
+      });
+      console.log(user);
+      await this.userRepository.save(user);
+      console.log('user saved');
+      await this.sendVerificationEmail(user, verificationToken);
+    } catch (e) {
+      console.log(e);
+    }
   }
   async verifyEmail(
     username: string,
@@ -28,13 +35,15 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { username },
     });
+    console.log(user);
     if (!user) {
       throw new NotFoundException('User not found');
     }
     if (user.verificationToken !== verificationToken) {
       return false;
     }
-    user.verified = true;
+
+    user.isVerified = true;
     await this.userRepository.save(user);
     return true;
   }
@@ -43,25 +52,28 @@ export class UserService {
     if (!user) {
       throw new NotFoundException('User not found');
     }
-    return user?.verified ?? false;
+    return user?.isVerified ?? false;
   }
   async sendVerificationEmail(
     user: User,
     verificationToken: string,
   ): Promise<void> {
     const transport = nodemailer.createTransport({
-      service: 'Gmail',
+      service: 'gmail',
       auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
+        user: 'farruk.bulut@gmail.com',
+        pass: 'hehu jzex wlfs yddd',
       },
+      host: 'smtp.gmail.com',
+      port: 465,
     });
+    console.log(process.env.EMAIL_USER);
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: 'farruk.bulut@gmail.com',
       to: user.email,
       subject: 'Verify your email',
-      text: `Click here to verify your email: http://localhost:3000/verify?token=${verificationToken}`,
+      text: `Click here to verify your email: http://localhost:3000/user/verify-email/${user.username}/${verificationToken}`,
     };
     await transport.sendMail(mailOptions);
   }
