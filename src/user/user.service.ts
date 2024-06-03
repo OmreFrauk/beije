@@ -61,8 +61,8 @@ export class UserService {
     const transport = nodemailer.createTransport({
       service: 'gmail',
       auth: {
-        user: 'farruk.bulut@gmail.com',
-        pass: 'hehu jzex wlfs yddd',
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASSWORD,
       },
       host: 'smtp.gmail.com',
       port: 465,
@@ -70,7 +70,7 @@ export class UserService {
     console.log(process.env.EMAIL_USER);
 
     const mailOptions = {
-      from: 'farruk.bulut@gmail.com',
+      from: process.env.EMAIL_USER,
       to: user.email,
       subject: 'Verify your email',
       text: `Click here to verify your email: http://localhost:3000/user/verify-email/${user.username}/${verificationToken}`,
