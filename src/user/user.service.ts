@@ -28,8 +28,11 @@ export class UserService {
     const user = await this.userRepository.findOne({
       where: { username },
     });
-    if (!user || user.verificationToken !== verificationToken) {
+    if (!user) {
       throw new NotFoundException('User not found');
+    }
+    if (user.verificationToken !== verificationToken) {
+      return false;
     }
     user.verified = true;
     await this.userRepository.save(user);
@@ -37,6 +40,9 @@ export class UserService {
   }
   async checkVerification(username: string): Promise<boolean> {
     const user = await this.userRepository.findOne({ where: { username } });
+    if (!user) {
+      throw new NotFoundException('User not found');
+    }
     return user?.verified ?? false;
   }
   async sendVerificationEmail(
@@ -44,7 +50,7 @@ export class UserService {
     verificationToken: string,
   ): Promise<void> {
     const transport = nodemailer.createTransport({
-      service: 'gmail',
+      service: 'Gmail',
       auth: {
         user: process.env.EMAIL_USER,
         pass: process.env.EMAIL_PASS,

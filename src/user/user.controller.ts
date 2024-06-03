@@ -3,6 +3,7 @@ import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Post,
 } from '@nestjs/common';
@@ -16,7 +17,7 @@ export class UserController {
   async register(@Body() createUserDto: CreateUserDto): Promise<void> {
     await this.userService.register(createUserDto);
   }
-  @Get('verify/:username/:verificationToken')
+  @Get('verify-email/:username/:verificationToken')
   async verifyEmail(
     @Param('username') username: string,
     @Param('verificationToken') verificationToken: string,
@@ -37,7 +38,7 @@ export class UserController {
   ): Promise<string> {
     const isVerified = await this.userService.checkVerification(username);
     if (!isVerified) {
-      return 'User is not verified';
+      throw new NotFoundException('User is not verified');
     }
     return 'User is verified';
   }
